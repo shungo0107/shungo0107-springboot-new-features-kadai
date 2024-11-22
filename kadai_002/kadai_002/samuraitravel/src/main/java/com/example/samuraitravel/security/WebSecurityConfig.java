@@ -38,7 +38,8 @@ public class WebSecurityConfig {
                 		                     "/houses/{id}",
                 		                     "/stripe/webhook",
                 		                     "/review",
-                		                     "/review/{id}").permitAll()  // すべてのユーザーにアクセスを許可するURL
+                		                     "/review/{id}",
+                		                     "/review/list/{id}").permitAll()  // すべてのユーザーにアクセスを許可するURL
                 .requestMatchers("/admin/**").hasRole("ADMIN")  // 管理者にのみアクセスを許可するURL
                 .anyRequest().authenticated()                   // 上記以外のURLはログインが必要（会員または管理者のどちらでもOK）
             )

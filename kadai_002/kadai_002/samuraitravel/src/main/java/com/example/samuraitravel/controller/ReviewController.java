@@ -4,7 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -49,9 +51,13 @@ public class ReviewController {
 	    	
 	    	House house = houseRepository.getReferenceById(id);
 	        Page<Review> review = reviewRepository. findByHouseId(id, pageable);
-	        
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();       
+	        boolean hasUserReviewed = review.stream().anyMatch(reviews -> reviews.getUser().getEmail().equals(authentication.getName()));
+
 	        model.addAttribute("review",review);
 	        model.addAttribute("house",house);  
+	        model.addAttribute("hasUserReviewed", hasUserReviewed);
+	        model.addAttribute("loginuser",authentication.getName());
 	        
 	        return "review/list";
 	    } 

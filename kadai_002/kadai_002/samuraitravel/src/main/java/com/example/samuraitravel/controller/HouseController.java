@@ -88,8 +88,7 @@ public class HouseController {
         House house = houseRepository.getReferenceById(id);
         Page<Review> review = reviewRepository.findByHouseId(id,pageable);
         
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();       
         boolean hasUserReviewed = review.stream().anyMatch(reviews -> reviews.getUser().getEmail().equals(authentication.getName()));
 
         model.addAttribute("house", house); 
