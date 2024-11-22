@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+ <html xmlns:th="https://www.thymeleaf.org">
+     <head>
+         <div th:replace="~{fragment :: meta}"></div>
+         <div th:replace="~{fragment :: styles}"></div>
+         
+         <title>レビュー一覧</title>       
+     </head>
+     <body>
+         <div class="samuraitravel-wrapper">
+             <!-- ヘッダー -->
+               <div th:replace="~{fragment :: header}"></div>
+             
+             <main>
+			  <div class="d-flex justify-content-center" style="width:800px;">
+				  <nav class="mt-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					 <ol class="breadcrumb mb-1">
+						 <li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+						 <li class="breadcrumb-item"><a th:href="@{/houses}">民宿一覧</a></li>
+						 <li class="breadcrumb-item"><a th:href="@{/houses/__${house.id}__}">民宿詳細</a></li>
+						 <li class="breadcrumb-item active" aria-current="page">レビュー一覧</li>
+					 </ol>
+			       </nav>
+			     </div>
+				 <h1 class="mt-4 text-center" th:text="${house.name} + 'のレビュー'"></h1>  
+                 <div class="review-card container center-block p-3">
+					 <div class="card d-flex m-2" th:each="reviews : ${review}"  style="width: 400px;">
+						 <div class="card-body">
+						   <div class="card-title d-flex justify-content-between">
+							 <h5 class="card-title" th:text="${reviews.getUser().getName()}"></h5>							 
+								 <div sec:authorize="isAuthenticated()" th:if="${user.id} == ${reviews.getUser().getId()}">
+									 <a  th:href="@{/review/edit/__${reviews.getId()}__}">編集</a>
+									 <a  href="#" class="samuraitravel-link-danger" data-bs-toggle="modal" th:data-bs-target="${'#deleteHouseModal' + reviews.getId()}">削除</a></td>     
+
+                                         <!-- 削除用モーダル -->
+                                         <div class="modal fade" th:id="${'deleteHouseModal' + reviews.getId()}" tabindex="-1" th:aria-labelledby="${'deleteHouseModalLabel' + reviews.getId()}">
+                                             <div class="modal-dialog">
+                                                 <div class="modal-content">
+                                                     <div class="modal-header">
+                                                         <h5 class="modal-title" th:id="${'deleteHouseModalLabel' + reviews.getId()}" th:text="${house.getName() + 'のレビューを削除してもよろしいですか？'}"></h5>
+                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+                                                     </div>
+                                                     <div class="modal-footer">
+                                                         <form method="post"th:action="@{/review/delete/__${reviews.getId()}__}">
+                                                             <button type="submit" class="btn samuraitravel-btn-danger text-white shadow-sm">削除</button>
+                                                         </form>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                       </div>
+                                     </div>
+                                         
+								 <div class="card-subtitle " th:if="${reviews.getAssessment() ==5}">
+									 <span class="text-warning" th:text="${'&#9733;' + '&#9733;' + '&#9733;' + '&#9733;' + '&#9733;'}"></span>
+								 </div>
+								 <div class="card-subtitle" th:if="${reviews.getAssessment() ==4}">
+									 <span class="text-warning" th:text="${'&#9733;' + '&#9733;' + '&#9733;' + '&#9733;' + '&#9734;'}"></span>
+								 </div>
+								 <div class="card-subtitle" th:if="${reviews.getAssessment() ==3}">
+									 <span class="text-warning" th:text="${'&#9733;' + '&#9733;' + '&#9733;' + '&#9734;' + '&#9734;'}"></span>
+							   </div>
+							   <div class="card-subtitle" th:if="${reviews.getAssessment() ==2}">
+								   <span class="text-warning" th:text="${'&#9733;' + '&#9733;' + '&#9734;' + '&#9734;' + '&#9734;'}"></span>
+							   </div>
+							   <div class="card-subtitle" th:if="${reviews.getAssessment() ==1}">
+								    <span class="text-warning" th:text="${'&#9733;' + '&#9734;' + '&#9734;' + '&#9734;' + '&#9734;'}"></span>
+						  	  </div>
+						  	  <p class="card-text"  th:text="${#dates.format(reviews.getCreateDate(), 'yyyy年MM月dd日')}"></p>
+						  	  <p class="card-text" th:text="${reviews.getComment()}"></p>
+				           </div>
+				       </div>
+				    </div>
+			      
+				<!-- ページネーション -->
+				<div th:if="${review.getTotalPages() > 1}" class="d-flex justify-content-center">
+					<nav aria-label="レビュー一覧ページ">
+						<ul class="pagination">
+							<li class="page-item">
+								<span th:if="${review.isFirst()}" class="page-link disabled">前</span>
+								<a th:unless="${review.isFirst()}" th:href="@{/review/list/__${house.id}__(page = ${review.getNumber() - 1})}" class="page-link samuraitravel-page-link">前</a>
+								</li>
+								<li th:each="i : ${#numbers.sequence(0, review.getTotalPages() - 1)}" class="page-item">
+									<span th:if="${i == review.getNumber()}" class="page-link active samuraitravel-active" th:text="${i + 1}"></span>
+									<a th:unless="${i == review.getNumber()}" th:href="@{/review/list/__${house.id}__(page = ${i})}" class="page-link samuraitravel-page-link" th:text="${i + 1}"></a>
+								</li>
+								<li class="page-item">
+									<span th:if="${review.isLast()}" class="page-link disabled">次</span>
+									<a th:unless="${review.isLast()}" th:href="@{/review/list/__${house.id}__(page = ${review.getNumber() + 1})}" class="page-link samuraitravel-page-link">次</a>
+								</li>
+                         </ul>
+                     </nav> 
+                 </div>
+                             
+             </main>
+             
+            <!-- フッター -->
+             <div th:replace="~{fragment :: footer}"></div>
+         </div>
+         <!-- Bootstrap -->
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>        
+     </body>
+ </html>
