@@ -28,7 +28,7 @@
 						 <div class="card-body">
 						   <div class="card-title d-flex justify-content-between">
 							 <h5 class="card-title" th:text="${reviews.getUser().getName()}"></h5>							 
-								 <div>
+								 <div sec:authorize="isAuthenticated()" th:if="${user.id} == ${reviews.getUser().getId()}">
 									 <a  th:href="@{/review/edit/__${reviews.getId()}__}">編集</a>
 									 <a  href="#" class="samuraitravel-link-danger" data-bs-toggle="modal" th:data-bs-target="${'#deleteHouseModal' + reviews.getId()}">削除</a></td>     
 
