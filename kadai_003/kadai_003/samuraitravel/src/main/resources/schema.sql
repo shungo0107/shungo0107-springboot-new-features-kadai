@@ -75,5 +75,6 @@
   create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (house_id) REFERENCES houses (id),
-  FOREIGN KEY (user_id) REFERENCES users (id)
+  FOREIGN KEY (user_id) REFERENCES users (id),
+  unique houseId_userId_index ( house_id,user_id)
  );

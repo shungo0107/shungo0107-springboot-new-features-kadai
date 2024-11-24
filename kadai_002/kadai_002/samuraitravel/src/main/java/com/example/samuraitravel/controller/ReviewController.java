@@ -4,9 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -47,17 +45,20 @@ public class ReviewController {
 	    @GetMapping("/list/{id}")
 	    public String index( @PathVariable(name = "id") Integer id,
 	                                  @PageableDefault(page = 0, size = 6, direction = Direction.ASC) Pageable pageable,
+	                                  @AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
 	    		                      Model model) {
-	    	
+
 	    	House house = houseRepository.getReferenceById(id);
-	        Page<Review> review = reviewRepository. findByHouseId(id, pageable);
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();       
-	        boolean hasUserReviewed = review.stream().anyMatch(reviews -> reviews.getUser().getEmail().equals(authentication.getName()));
+	    	Page<Review> review = reviewRepository. findByHouseId(id, pageable);
 
 	        model.addAttribute("review",review);
 	        model.addAttribute("house",house);  
-	        model.addAttribute("hasUserReviewed", hasUserReviewed);
-	        model.addAttribute("loginuser",authentication.getName());
+	        
+	        if (userDetailsImpl != null) {
+	        	User user = userDetailsImpl.getUser();
+		        model.addAttribute("user",user);
+	        	
+	        }
 	        
 	        return "review/list";
 	    } 

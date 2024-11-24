@@ -101,3 +101,16 @@ INSERT IGNORE INTO review (id, house_id, user_id, assessment, text_comment) VALU
 INSERT IGNORE INTO review (id, house_id, user_id, assessment, text_comment) VALUES (10, 1, 10,1, '部屋がいい感じ');
 INSERT IGNORE INTO review (id, house_id, user_id, assessment, text_comment) VALUES (11, 1, 11, 2, '部屋がいい感じ');
 INSERT IGNORE INTO review (id, house_id, user_id, assessment, text_comment) VALUES (11, 1, 11, 2, '部屋がいい感じ');
+
+ -- favoriteテーブル
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (1, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (2, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (3, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (4, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (5, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (6, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (7, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (8, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (9, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (10, 1);
+INSERT IGNORE INTO favorite ( house_id, user_id) VALUES (11, 1);

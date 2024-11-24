@@ -67,3 +67,14 @@
   FOREIGN KEY (house_id) REFERENCES houses (id),
   FOREIGN KEY (user_id) REFERENCES users (id)
  );
+ 
+  CREATE TABLE IF NOT EXISTS favorite (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  house_id INT NOT NULL,
+  user_id INT NOT NULL,
+  create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (house_id) REFERENCES houses (id),
+  FOREIGN KEY (user_id) REFERENCES users (id),
+  unique houseId_userId_index ( house_id,user_id)
+ );

@@ -34,7 +34,7 @@
                                          <label for="score" class="col-form-label text-md-left fw-bold">評価</label>
                                      </div>
                                      <div class="col-md-8">
-										 <select class="form-control form-select text-warning" th:name="score">
+										 <select class="form-control form-select text-warning" th:name="score" th:field="*{score}">
 											 <option value="5" >★★★★★★</option>
 											 <option value="4" >★★★★★</option>
 											 <option value="3" >★★★</option>

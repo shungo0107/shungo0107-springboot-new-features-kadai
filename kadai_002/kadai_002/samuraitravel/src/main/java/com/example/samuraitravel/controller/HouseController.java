@@ -4,8 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,20 +14,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.samuraitravel.entity.House;
 import com.example.samuraitravel.entity.Review;
+import com.example.samuraitravel.entity.User;
 import com.example.samuraitravel.form.ReservationInputForm;
+import com.example.samuraitravel.repository.FavoriteRepository;
 import com.example.samuraitravel.repository.HouseRepository;
 import com.example.samuraitravel.repository.ReviewRepository;
+import com.example.samuraitravel.security.UserDetailsImpl;
 
 @Controller
 @RequestMapping("/houses")
 // 民宿一覧ページを担当するコントローラ
 public class HouseController {
     private final HouseRepository houseRepository;        
-    private final ReviewRepository reviewRepository;            
+    private final ReviewRepository reviewRepository;        
+    private final FavoriteRepository favoriteRepository;            
     
-    public HouseController(HouseRepository houseRepository,ReviewRepository reviewRepository) {
+    public HouseController(HouseRepository houseRepository,
+    									ReviewRepository reviewRepository,
+    									FavoriteRepository favoriteRepository) {
         this.houseRepository = houseRepository;
-        this.reviewRepository = reviewRepository;        
+        this.reviewRepository = reviewRepository;
+        this.favoriteRepository = favoriteRepository;  
     }     
   
     @GetMapping
@@ -41,10 +47,9 @@ public class HouseController {
                                       @RequestParam(name = "price", required = false) Integer price, 
                                       @RequestParam(name = "order", required = false) String order,
                                       @PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.ASC) Pageable pageable,
-                                      Model model) 
-    {
+                                      Model model) {
         Page<House> housePage;
-                
+                       
         if (keyword != null && !keyword.isEmpty()) {
             if (order != null && order.equals("priceAsc")) {
                 housePage = houseRepository.findByNameLikeOrAddressLikeOrderByPriceAsc("%" + keyword + "%", "%" + keyword + "%", pageable);
@@ -82,20 +87,28 @@ public class HouseController {
     }
     
     @GetMapping("/{id}") 
-    public String show(@PathVariable(name = "id") Integer id,
-    		                     @PageableDefault(page = 0, size = 6,direction = Direction.ASC) Pageable pageable,
+    public String show(@PathVariable(name = "id") Integer houseId,
+    							@PageableDefault(page = 0, size = 6, direction = Direction.ASC) Pageable pageable,
+    		                     @AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
     		                     Model model) {
-        House house = houseRepository.getReferenceById(id);
-        Page<Review> review = reviewRepository.findByHouseId(id,pageable);
-        
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();       
-        boolean hasUserReviewed = review.stream().anyMatch(reviews -> reviews.getUser().getEmail().equals(authentication.getName()));
 
+    	House house = houseRepository.getReferenceById(houseId);
+        Page<Review> review = reviewRepository.findByHouseIdOrderByCreateDate(houseId,pageable);
+        
         model.addAttribute("house", house); 
         model.addAttribute("reservationInputForm", new ReservationInputForm());
         model.addAttribute("review", review);
-        model.addAttribute("hasUserReviewed", hasUserReviewed);
-        model.addAttribute("loginuser",authentication.getName());
+                
+        if (userDetailsImpl != null) {
+        	User user = userDetailsImpl.getUser();
+            boolean hasUserReviewed = !reviewRepository.findByHouseIdAndUserId(houseId, user.getId()).isEmpty();
+		    boolean hasUserFavorite  =  !favoriteRepository.findByHouseIdAndUserId(houseId, user.getId()).isEmpty();
+		
+		    model.addAttribute("hasUserReviewed", hasUserReviewed);
+		    model.addAttribute("hasUserFavorite", hasUserFavorite);
+		    model.addAttribute("user", user);
+        }
+        
         
         return "houses/show";
     } 
