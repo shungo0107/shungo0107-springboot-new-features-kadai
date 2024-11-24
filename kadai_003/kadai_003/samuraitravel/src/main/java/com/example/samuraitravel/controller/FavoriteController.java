@@ -56,7 +56,7 @@ public class FavoriteController {
 	public String delete(@PathVariable("houseId") Integer houseId,
 									@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, Model model) {
 		User user = userDetailsImpl.getUser();
-		favoriteService.delete(user.getId(),houseId);
+		favoriteService.delete(houseId,user.getId());
 		return "redirect:/houses/" + houseId;
 	}
 
